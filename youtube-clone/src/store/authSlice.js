@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Async thunk for signup
 export const signup = createAsyncThunk('auth/signup', async ({ username, email, password }, { rejectWithValue }) => {
   try {
     const response = await axios.post('http://localhost:5000/api/auth/signup', {
@@ -9,20 +8,19 @@ export const signup = createAsyncThunk('auth/signup', async ({ username, email, 
       email,
       password,
     });
-    return response.data; // { token, user }
+    return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data.error);
   }
 });
 
-// Async thunk for login
 export const login = createAsyncThunk('auth/login', async ({ email, password }, { rejectWithValue }) => {
   try {
     const response = await axios.post('http://localhost:5000/api/auth/login', {
       email,
       password,
     });
-    return response.data; // { token, user }
+    return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data.error);
   }
@@ -44,11 +42,10 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.status = 'idle';
       state.error = null;
-      localStorage.removeItem('token'); // Clear token
+      localStorage.removeItem('token');
     },
   },
   extraReducers: (builder) => {
-    // Signup
     builder
       .addCase(signup.pending, (state) => {
         state.status = 'loading';
@@ -59,13 +56,12 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
-        localStorage.setItem('token', action.payload.token); // Store token
+        localStorage.setItem('token', action.payload.token);
       })
       .addCase(signup.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })
-      // Login
       .addCase(login.pending, (state) => {
         state.status = 'loading';
         state.error = null;
