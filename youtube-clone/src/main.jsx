@@ -22,8 +22,8 @@ const AuthInitializer = ({ children }) => {
           },
         });
       } catch (error) {
+        console.error('Invalid token:', error);
         localStorage.removeItem('token');
-        console.log({ error })
       }
     }
   }, [dispatch]);

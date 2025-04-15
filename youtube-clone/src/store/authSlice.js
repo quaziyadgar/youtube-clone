@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const signup = createAsyncThunk('auth/signup', async ({ username, email, password }, { rejectWithValue }) => {
   try {
-    const response = await axios.post('http://localhost:5000/api/auth/signup', {
+    const response = await axios.post('https://youtube-clone-server-sage.vercel.app/api/auth/signup', {
       username,
       email,
       password,
@@ -16,7 +16,7 @@ export const signup = createAsyncThunk('auth/signup', async ({ username, email, 
 
 export const login = createAsyncThunk('auth/login', async ({ email, password }, { rejectWithValue }) => {
   try {
-    const response = await axios.post('http://localhost:5000/api/auth/login', {
+    const response = await axios.post('https://youtube-clone-server-sage.vercel.app/api/auth/login', {
       email,
       password,
     });

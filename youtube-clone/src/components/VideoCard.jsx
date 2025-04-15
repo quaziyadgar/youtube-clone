@@ -1,19 +1,18 @@
-import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 
 const VideoCard = ({ video }) => {
-  const { title, thumbnailUrl, uploader, views } = video;
-
-  // Memoize card to prevent re-renders
-  const cardContent = useMemo(() => (
-    <div className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-      <img src={thumbnailUrl} alt={title} className="w-full h-40 object-cover rounded" />
-      <h3 className="text-lg font-semibold mt-2 truncate">{title}</h3>
-      <p className="text-sm text-gray-600">{uploader}</p>
-      <p className="text-sm text-gray-600">{views} views</p>
-    </div>
-  ), [title, thumbnailUrl, uploader, views]);
-
-  return cardContent;
+  return (
+    <Link to={`/video/${video.videoId}`}>
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+        <img src={video.thumbnailUrl} alt={video.title} className="w-full h-40 object-cover" />
+        <div className="p-4">
+          <h3 className="text-lg font-semibold line-clamp-2">{video.title}</h3>
+          <p className="text-sm text-gray-600">{video.uploader}</p>
+          <p className="text-sm text-gray-500">{video.views} views • {new Date(video.uploadDate).toLocaleDateString()}</p>
+        </div>
+      </div>
+    </Link>
+  );
 };
 
 export default VideoCard;

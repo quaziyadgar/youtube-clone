@@ -29,7 +29,7 @@ const Register = () => {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -39,7 +39,7 @@ const Register = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -49,20 +49,23 @@ const Register = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors"
           disabled={status === 'loading'}
         >
           {status === 'loading' ? 'Registering...' : 'Register'}
         </button>
-        <p className="mt-4 text-center">
-          Already have an account? <Link to="/login" className="text-blue-500">Login</Link>
+        <p className="mt-4 text-center text-sm">
+          Already have an account?{' '}
+          <Link to="/login" className="text-blue-500 hover:underline">
+            Login
+          </Link>
         </p>
       </form>
     </div>
