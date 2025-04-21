@@ -1,122 +1,109 @@
-import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchChannel, createVideo, deleteVideo } from '../store/videoSlice';
-import { Link } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
-
-const VideoCard = lazy(() => import('../components/VideoCard'));
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { createVideo, fetchVideos } from '../store/videoSlice';
+import VideoCard from '../components/VideoCard';
 
 const Channel = () => {
+  const { channelId } = useParams();
   const dispatch = useDispatch();
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
-  const { channel, status, error } = useSelector((state) => state.videos);
-  const [videoData, setVideoData] = useState({
+  const { filteredVideos, status, error } = useSelector((state) => state.videos);
+  const { user } = useSelector((state) => state.auth);
+  const [formData, setFormData] = useState({
     title: '',
-    thumbnailUrl: '',
     description: '',
-    channelId: user?.username || '',
+    videoUrl: '',
+    channelId,
   });
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      dispatch(fetchChannel(user.username));
-    }
-  }, [dispatch, isAuthenticated, user]);
+    dispatch(fetchVideos());
+  }, [dispatch]);
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isAuthenticated) {
-      await dispatch(createVideo({ ...videoData, channelId: user.username }));
-      setVideoData({ title: '', thumbnailUrl: '', description: '', channelId: user.username });
-      dispatch(fetchChannel(user.username));
+    if (!user) {
+      alert('Please log in to upload a video');
+      return;
+    }
+    try {
+      await dispatch(createVideo(formData)).unwrap();
+      setFormData({ title: '', description: '', videoUrl: '', channelId });
+      alert('Video uploaded successfully');
+    } catch (err) {
+      alert(`Upload failed: ${err.error || 'Try again'}`);
     }
   };
 
-  const handleDelete = async (videoId) => {
-    if (isAuthenticated) {
-      await dispatch(deleteVideo(videoId));
-      dispatch(fetchChannel(user.username));
-    }
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p>
-          Please <Link to="/login" className="text-blue-500 hover:underline">sign in</Link> to view your channel.
-        </p>
-      </div>
-    );
-  }
+  const channelVideos = filteredVideos.filter((video) => video.channelId === channelId);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6">Your Channel: {user.username}</h2>
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h3 className="text-xl font-semibold mb-4">Upload New Video</h3>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Title</label>
-            <input
-              type="text"
-              value={videoData.title}
-              onChange={(e) => setVideoData({ ...videoData, title: e.target.value })}
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Thumbnail URL</label>
-            <input
-              type="url"
-              value={videoData.thumbnailUrl}
-              onChange={(e) => setVideoData({ ...videoData, thumbnailUrl: e.target.value })}
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Description</label>
-            <textarea
-              value={videoData.description}
-              onChange={(e) => setVideoData({ ...videoData, description: e.target.value })}
-              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows="4"
-            />
-          </div>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Upload Video
-          </button>
-        </form>
-
-        <h3 className="text-xl font-semibold mb-4">Your Videos</h3>
-        {status === 'loading' ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p className="text-red-500">{error}</p>
-        ) : channel?.videos.length === 0 ? (
-          <p>No videos uploaded yet.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {channel.videos.map((video) => (
-              <Suspense key={video.videoId} fallback={<div className="h-40 bg-gray-200 rounded animate-pulse" />}>
-                <div className="relative">
-                  <VideoCard video={video} />
-                  <button
-                    onClick={() => handleDelete(video.videoId)}
-                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </Suspense>
-            ))}
-          </div>
-        )}
-      </div>
+    <div className="max-w-6xl mx-auto p-4 bg-gray-900 text-white">
+      <h1 className="text-3xl mb-4">Channel</h1>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {user && (
+        <div className="mb-8">
+          <h2 className="text-2xl mb-4">Upload Video</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium">Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                className="w-full p-2 bg-gray-800 rounded"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                className="w-full p-2 bg-gray-800 rounded"
+                rows="4"
+              ></textarea>
+            </div>
+            <div>
+              <label className="block text-sm font-medium">YouTube URL</label>
+              <input
+                type="url"
+                name="videoUrl"
+                value={formData.videoUrl}
+                onChange={handleInputChange}
+                className="w-full p-2 bg-gray-800 rounded"
+                placeholder="https://www.youtube.com/watch?v=..."
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
+              disabled={status === 'loading'}
+            >
+              Upload
+            </button>
+          </form>
+        </div>
+      )}
+      <h2 className="text-2xl mb-4">Videos</h2>
+      {status === 'loading' ? (
+        <div>Loading...</div>
+      ) : channelVideos.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {channelVideos.map((video) => (
+            <VideoCard key={video.videoId} video={video} />
+          ))}
+        </div>
+      ) : (
+        <div>No videos found</div>
+      )}
     </div>
   );
 };

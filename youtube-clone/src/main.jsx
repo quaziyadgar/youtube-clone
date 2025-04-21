@@ -3,8 +3,10 @@ import ReactDOM from 'react-dom/client';
 import { Provider, useDispatch } from 'react-redux';
 import { store } from './store';
 import App from './App.jsx';
-import './index.css';
+import { BrowserRouter } from "react-router-dom"
 import { jwtDecode } from 'jwt-decode';
+import './index.css';
+import './fontAwesome.js';
 
 const AuthInitializer = ({ children }) => {
   const dispatch = useDispatch();
@@ -34,7 +36,9 @@ const AuthInitializer = ({ children }) => {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <AuthInitializer>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </AuthInitializer>
   </Provider>
 );
