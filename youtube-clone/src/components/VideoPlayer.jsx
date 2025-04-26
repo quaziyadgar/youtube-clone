@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { likeVideo, dislikeVideo, addComment, editComment, deleteComment } from '../store/videoSlice';
 
-const VideoPlayer = ({ video }) => {
+const VideoPlayer = ({ video, status }) => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { id:loginId, user } = useSelector((state) => state.auth);
+  // const channelName = useSelector((state) => state.videos.channelNames[video?.channelId])
   const [commentText, setCommentText] = useState('');
   const [editCommentId, setEditCommentId] = useState(null);
   const [editCommentText, setEditCommentText] = useState('');
@@ -54,6 +55,8 @@ const VideoPlayer = ({ video }) => {
     }
   };
 
+  console.log(loginId, user, video)
+
   return (
     <div className="bg-black py-10">
       <div className="max-w-5xl mx-auto bg-black">
@@ -77,7 +80,7 @@ const VideoPlayer = ({ video }) => {
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z" />
               </svg>
-              {video.likes || 0}
+              {video.likes || video.likes.length || 0}
             </button>
             <button
               onClick={handleDislike}
@@ -86,14 +89,15 @@ const VideoPlayer = ({ video }) => {
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M15 3h-9c-1.1 0-2 .9-2 2v10c0 .55.22 1.05.59 1.41L1.41 23 7 16.59c.3.5 1 1.41 2 1.41h9c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm4 14c0 .55-.45 1-1 1H9l-3.59-3.59C5.22 14.05 5 13.55 5 13V5c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v12z" />
               </svg>
-              {video.dislikes || 0}
+              {video.dislikes || video.dislikes.length || 0}
             </button>
           </div>
         </div>
         <div className="mt-4 border-t border-gray-700 pt-4">
           <p className="text-sm text-gray-300">{video.description || 'No description'}</p>
-          <p className="text-sm text-gray-400 mt-2">Channel: {video.channelId}</p>
+          <p className="text-sm text-gray-400 mt-2">Channel: {video.uploader}</p>
         </div>
+        {(status === "loading")?<div>loading...</div>:
         <div className="mt-6">
           <h3 className="text-lg font-semibold text-black mb-4">Comments</h3>
           {user && (
@@ -118,7 +122,7 @@ const VideoPlayer = ({ video }) => {
               video.comments.map((comment) => (
                 <div key={comment.commentId} className="flex gap-3">
                   <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-black text-sm">
-                    {comment.userId[0].toUpperCase()}
+                    {comment?.userId[0].toUpperCase()}
                   </div>
                   <div className="flex-1">
                     {editCommentId === comment.commentId ? (
@@ -149,11 +153,11 @@ const VideoPlayer = ({ video }) => {
                       <>
                         <p className="text-sm text-white">{comment.userId} • {new Date(comment.timestamp).toLocaleDateString()}</p>
                         <p className="text-sm text-white">{comment.text}</p>
-                        {user && user.username === comment.userId && (
+                        {user && localStorage.getItem(loginId) === comment.userId && (
                           <div className="flex gap-2 mt-1">
                             <button
                               onClick={() => handleEditComment(comment)}
-                              className="text-xs text-blue-400 hover:text-blue-300"
+                              className="text-xs text-white hover:text-blue-300"
                             >
                               Edit
                             </button>
@@ -174,7 +178,7 @@ const VideoPlayer = ({ video }) => {
               <p className="text-sm text-gray-400">No comments yet</p>
             )}
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );

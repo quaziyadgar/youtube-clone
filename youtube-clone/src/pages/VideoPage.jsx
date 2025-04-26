@@ -16,7 +16,7 @@ const VideoPage = () => {
   if (status === 'loading') return <div className='text-white'>Loading...</div>;
   if (status === 'failed' || !currentVideo) return <div className='text-white'>Video not found</div>;
 
-  return <VideoPlayer video={currentVideo} />;
+  return <VideoPlayer video={currentVideo} status={status} />;
 };
 
 export default VideoPage;

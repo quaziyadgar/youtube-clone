@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'https://youtube-clone-server-sage.vercel.app/api/videos';
+const API_URL = 'https://youtube-clone-server-sage.vercel.app/api';
 
 export const fetchVideos = createAsyncThunk('videos/fetchVideos', async ({ search } = {}, { rejectWithValue }) => {
   try {
-    const url = search ? `${API_URL}?search=${encodeURIComponent(search)}` : API_URL;
+    const url = search ? `${API_URL}/videos?search=${encodeURIComponent(search)}` : `${API_URL}/videos`;
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
@@ -15,7 +15,7 @@ export const fetchVideos = createAsyncThunk('videos/fetchVideos', async ({ searc
 
 export const fetchVideo = createAsyncThunk('videos/fetchVideo', async (videoId, { rejectWithValue }) => {
   try {
-    const response = await axios.get(`${API_URL}/${videoId}`);
+    const response = await axios.get(`${API_URL}/videos/${videoId}`);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response?.data || 'Failed to fetch video');
@@ -25,7 +25,7 @@ export const fetchVideo = createAsyncThunk('videos/fetchVideo', async (videoId, 
 export const createVideo = createAsyncThunk('videos/createVideo', async (videoData, { getState, rejectWithValue }) => {
   try {
     const { auth: { token } } = getState();
-    const response = await axios.post(API_URL, videoData, {
+    const response = await axios.post(`${API_URL}/videos`, videoData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -34,21 +34,66 @@ export const createVideo = createAsyncThunk('videos/createVideo', async (videoDa
   }
 });
 
-export const likeVideo = createAsyncThunk('videos/likeVideo', async (videoId, { getState }) => {
-  const { videos: { currentVideo } } = getState();
-  return { videoId, likes: (currentVideo?.likes || 0) + 1 };
+// Update an existing video
+export const updateVideo = createAsyncThunk('videos/updateVideo', async ({ videoId, ...videoData }, { rejectWithValue }) => {
+  try {
+    const response = await axios.put(`${API_URL}/videos/${videoId}`, videoData);
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || 'Failed to update video');
+  }
 });
 
-export const dislikeVideo = createAsyncThunk('videos/dislikeVideo', async (videoId, { getState }) => {
-  const { videos: { currentVideo } } = getState();
-  return { videoId, dislikes: (currentVideo?.dislikes || 0) + 1 };
+// Delete a video
+export const deleteVideo = createAsyncThunk('videos/deleteVideo', async (videoId, { rejectWithValue }) => {
+  try {
+    await axios.delete(`${API_URL}/videos/${videoId}`);
+    return videoId; // Return videoId to remove from state
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || 'Failed to delete video');
+  }
 });
+
+
+export const likeVideo = createAsyncThunk(
+  'video/likeVideo',
+  async (videoId, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.user?.token;
+      const response = await axios.put(
+        `${API_URL}/videos/${videoId}/like`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to like video');
+    }
+  }
+);
+
+export const dislikeVideo = createAsyncThunk(
+  'video/dislikeVideo',
+  async (videoId, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.user?.token;
+      const response = await axios.put(
+        `${API_URL}/videos/${videoId}/dislike`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to dislike video');
+    }
+  }
+);
 
 export const addComment = createAsyncThunk('videos/addComment', async ({ videoId, text }, { getState, rejectWithValue }) => {
   try {
     const { auth: { token } } = getState();
     const response = await axios.post(
-      `${API_URL}/${videoId}/comments`,
+      `${API_URL}/videos/${videoId}/comments`,
       { text },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -61,7 +106,7 @@ export const addComment = createAsyncThunk('videos/addComment', async ({ videoId
 export const editComment = createAsyncThunk('videos/editComment', async ({ videoId, commentId, text }, { getState, rejectWithValue }) => {
   try {
     const { auth: { token, user } } = getState();
-    const response = await axios.put(`${API_URL}/${videoId}/comments/${commentId}`, { text }, {
+    const response = await axios.put(`${API_URL}/videos/${videoId}/comments/${commentId}`, { text }, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return { ...response.data, userId: user.username };
@@ -73,7 +118,7 @@ export const editComment = createAsyncThunk('videos/editComment', async ({ video
 export const deleteComment = createAsyncThunk('videos/deleteComment', async ({ videoId, commentId }, { getState, rejectWithValue }) => {
   try {
     const { auth: { token } } = getState();
-    await axios.delete(`${API_URL}/${videoId}/comments/${commentId}`, {
+    await axios.delete(`${API_URL}/videos/${videoId}/comments/${commentId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return { videoId, commentId };
@@ -90,6 +135,7 @@ const videoSlice = createSlice({
     currentVideo: null,
     status: 'idle',
     error: null,
+    channelNames: {}
   },
   reducers: {
     setFilter: (state, action) => {
@@ -102,6 +148,38 @@ const videoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+    .addCase(updateVideo.pending, (state) => {
+      state.status = 'loading';
+      state.error = null;
+    })
+    .addCase(updateVideo.fulfilled, (state, action) => {
+      state.status = 'succeeded';
+      const updatedVideo = action.payload;
+      state.videos = state.videos.map((video) =>
+        video.videoId === updatedVideo.videoId ? updatedVideo : video
+      );
+      state.filteredVideos = state.filteredVideos.map((video) =>
+        video.videoId === updatedVideo.videoId ? updatedVideo : video
+      );
+    })
+    .addCase(updateVideo.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload;
+    })
+    .addCase(deleteVideo.pending, (state) => {
+      state.status = 'loading';
+      state.error = null;
+    })
+    .addCase(deleteVideo.fulfilled, (state, action) => {
+      state.status = 'succeeded';
+      const videoId = action.payload;
+      state.videos = state.videos.filter((video) => video.videoId !== videoId);
+      state.filteredVideos = state.filteredVideos.filter((video) => video.videoId !== videoId);
+    })
+    .addCase(deleteVideo.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action.payload;
+    })
       .addCase(fetchVideos.pending, (state) => {
         state.status = 'loading';
       })
@@ -146,6 +224,7 @@ const videoSlice = createSlice({
         if (currentVideo) currentVideo.dislikes = action.payload.dislikes;
       })
       .addCase(addComment.fulfilled, (state, action) => {
+        state.status = 'succeeded';
         const video = state.videos.find(v => v.videoId === action.meta.arg.videoId);
         const filteredVideo = state.filteredVideos.find(v => v.videoId === action.meta.arg.videoId);
         const currentVideo = state.currentVideo?.videoId === action.meta.arg.videoId ? state.currentVideo : null;
@@ -153,7 +232,11 @@ const videoSlice = createSlice({
         if (filteredVideo) filteredVideo.comments.push(action.payload);
         if (currentVideo) currentVideo.comments.push(action.payload);
       })
+      .addCase(addComment.pending, (state) => {
+        state.status = 'loading';
+      })
       .addCase(editComment.fulfilled, (state, action) => {
+        state.status = "succeeded";
         const video = state.videos.find(v => v.videoId === action.meta.arg.videoId);
         const filteredVideo = state.filteredVideos.find(v => v.videoId === action.meta.arg.videoId);
         const currentVideo = state.currentVideo?.videoId === action.meta.arg.videoId ? state.currentVideo : null;
@@ -179,7 +262,11 @@ const videoSlice = createSlice({
           }
         }
       })
+      .addCase(editComment.pending, (state) => {
+        state.status = 'loading';
+      })
       .addCase(deleteComment.fulfilled, (state, action) => {
+        state.status = "succeeded"
         const video = state.videos.find(v => v.videoId === action.payload.videoId);
         const filteredVideo = state.filteredVideos.find(v => v.videoId === action.payload.videoId);
         const currentVideo = state.currentVideo?.videoId === action.payload.videoId ? state.currentVideo : null;
@@ -192,6 +279,9 @@ const videoSlice = createSlice({
         if (currentVideo) {
           currentVideo.comments = currentVideo.comments.filter(c => c.commentId !== action.payload.commentId);
         }
+      })
+      .addCase(deleteComment.pending, (state) => {
+        state.status = 'loading';
       });
   },
 });

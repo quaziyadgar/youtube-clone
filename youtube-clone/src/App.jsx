@@ -6,6 +6,7 @@ import Channel from './pages/Channel';
 import VideoPage from './pages/VideoPage';
 import { Header } from './components/Header';
 import { useState } from 'react';
+import CreateChannel from './components/CreateChannel';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -19,6 +20,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/video/:videoId" element={<VideoPage />} />
           <Route path="/channel" element={<Channel />} />
+          <Route path="/create-channel" element={<CreateChannel />} />
         </Routes>
       </div>
     </>
