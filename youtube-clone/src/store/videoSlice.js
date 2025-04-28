@@ -66,10 +66,11 @@ export const likeVideo = createAsyncThunk(
   'video/likeVideo',
   async (videoId, { rejectWithValue, getState }) => {
     try {
-      const token = getState().auth.user?.token;
-      const response = await axios.put(
+      const userId = getState().auth.id;
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
         `${API_URL}/videos/${videoId}/like`,
-        {},
+        {userId},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       return response.data;
@@ -83,10 +84,11 @@ export const dislikeVideo = createAsyncThunk(
   'video/dislikeVideo',
   async (videoId, { rejectWithValue, getState }) => {
     try {
-      const token = getState().auth.user?.token;
-      const response = await axios.put(
+      const userId = getState().auth.id;
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
         `${API_URL}/videos/${videoId}/dislike`,
-        {},
+        {userId},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       return response.data;

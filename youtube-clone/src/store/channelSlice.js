@@ -23,9 +23,9 @@ export const fetchChannels = createAsyncThunk(
 // Create channel
 export const createChannel = createAsyncThunk(
   'channels/createChannel',
-  async ({ name }, { rejectWithValue, getState }) => {
+  async ({ name }, { rejectWithValue }) => {
     try {
-      const token = getState().auth?.token;
+      const token = localStorage.getItem('token');
       const response = await axios.post(
         `${API_URL}/channels/createChannel`,
         { name },

@@ -50,6 +50,7 @@ const Channel = () => {
   };
 
   const handleEdit = (video) => {
+    scrollTo(0,0);
     setEditMode(true);
     setEditVideoId(video.videoId);
     setFormData({
