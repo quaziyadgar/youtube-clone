@@ -55,7 +55,7 @@ const VideoPlayer = ({ video, status }) => {
     }
   };
 
-  console.log(loginId, user, video)
+  console.log(loginId, user, video);
 
   return (
     <div className="bg-black py-10">
@@ -122,10 +122,10 @@ const VideoPlayer = ({ video, status }) => {
               video.comments.map((comment) => (
                 <div key={comment.commentId} className="flex gap-3">
                   <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-black text-sm">
-                    {comment?.userId[0].toUpperCase()}
+                    {comment?.userId}
                   </div>
                   <div className="flex-1">
-                    {editCommentId === comment.commentId ? (
+                    {editCommentId == comment.commentId ? (
                       <form onSubmit={handleEditSubmit} className="mb-2">
                         <textarea
                           value={editCommentText}
@@ -153,7 +153,7 @@ const VideoPlayer = ({ video, status }) => {
                       <>
                         <p className="text-sm text-white">{comment.userId} • {new Date(comment.timestamp).toLocaleDateString()}</p>
                         <p className="text-sm text-white">{comment.text}</p>
-                        {user && localStorage.getItem(loginId) === comment.userId && (
+                        {user && localStorage.getItem(loginId) == comment.userId && (
                           <div className="flex gap-2 mt-1">
                             <button
                               onClick={() => handleEditComment(comment)}

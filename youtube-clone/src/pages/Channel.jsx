@@ -7,24 +7,20 @@ import VideoCard from '../components/VideoCard';
 
 const Channel = () => {
   const { channelId } = useParams();
-  const dispatch = useDispatch();
-  const { filteredVideos, status: videoStatus } = useSelector((state) => state.videos);
-  const { channels, status: channelStatus } = useSelector((state) => state.channels);
-  const { token, user } = useSelector((state) => state.auth);
-
+  const [editMode, setEditMode] = useState(false);
+  const [editVideoId, setEditVideoId] = useState(null);
+  const [userChannels, setUserChannels] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     videoUrl: '',
     channelId: channelId || '',
   });
-  const [editMode, setEditMode] = useState(false);
-  const [editVideoId, setEditVideoId] = useState(null);
 
-  useEffect(() => {
-    dispatch(fetchVideos());
-    dispatch(fetchChannels());
-  }, [dispatch]);
+  const dispatch = useDispatch();
+  const { filteredVideos, status: videoStatus } = useSelector((state) => state.videos);
+  const { channels, status: channelStatus } = useSelector((state) => state.channels);
+  const { token, user } = useSelector((state) => state.auth);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,6 +34,7 @@ const Channel = () => {
     }
     try {
       if (editMode) {
+        console.log(editMode);
         await dispatch(updateVideo({ videoId: editVideoId, ...formData })).unwrap();
         alert('Video updated successfully');
       } else {
@@ -72,20 +69,24 @@ const Channel = () => {
       alert(`Deletion failed: ${err.error || 'Try again'}`);
     }
   };
+  
+  useEffect(() => {
+    dispatch(fetchChannels());
+    dispatch(fetchVideos());
+    const userChannelsData = channels.filter((channel) => channel.userId === user?.userId);
+    setUserChannels(userChannelsData);
+  }, [dispatch]);
 
-  console.log(token);
+  // const channelVideos = filteredVideos.filter((video) => video.channelId === channelId);
 
-  const userChannels = channels.filter((channel) => channel.userId === user?.userId);
-  const channelVideos = filteredVideos.filter((video) => video.channelId === channelId);
-
-  console.log('Channel: Render', {
-    user,
-    token,
-    userChannels,
-    channelVideos,
-    videoStatus,
-    channelStatus,
-  });
+  // console.log('Channel: Render', {
+  //   user,
+  //   token,
+  //   userChannels,
+  //   channelVideos,
+  //   videoStatus,
+  //   channelStatus,
+  // });
 
   if (!user || !token) {
     return (
@@ -114,8 +115,8 @@ const Channel = () => {
                 required
               >
                 <option value="">Select a channel</option>
-                {userChannels.map((channel) => (
-                  <option key={channel.channelId} value={channel.channelId}>
+                {userChannels.map((channel, idx) => (
+                  <option key={channel.channelId || idx} value={channel.channelId}>
                     {channel.name}
                   </option>
                 ))}
@@ -184,8 +185,8 @@ const Channel = () => {
       {channelStatus === 'loading' || videoStatus === 'loading' ? (
         <div>Loading...</div>
       ) : userChannels.length > 0 ? (
-        userChannels.map((channel) => (
-          <div key={channel.channelId} className="mb-8">
+        userChannels.map((channel, idx) => (
+          <div key={channel.channelId || idx} className="mb-8">
             <h2 className="text-2xl mb-2">{channel.name}</h2>
             <p className="text-gray-400 mb-4">{channel.description}</p>
             <h3 className="text-xl mb-4">Videos</h3>
@@ -193,8 +194,8 @@ const Channel = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {filteredVideos
                   .filter((video) => video.channelId === channel.channelId)
-                  .map((video) => (
-                    <div key={video.videoId} className="relative">
+                  .map((video,idx) => (
+                    <div key={video.videoId || idx} className="relative">
                       <VideoCard video={video} />
                       {user && user.userId === video.userId && (
                         <div className="absolute top-2 right-2 flex space-x-2">

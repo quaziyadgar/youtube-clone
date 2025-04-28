@@ -12,7 +12,10 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await dispatch(login({ email, password }));
+    const result = await dispatch(login({ email, password })).unwrap();
+    setTimeout(() => {
+      navigate('/');
+    }, 100);
     if (login.fulfilled.match(result)) {
       navigate('/');
     }

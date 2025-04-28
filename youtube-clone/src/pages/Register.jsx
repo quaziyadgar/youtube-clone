@@ -15,7 +15,9 @@ const Register = () => {
     e.preventDefault();
     const result = await dispatch(signup({ username, email, password }));
     if (signup.fulfilled.match(result)) {
-      navigate('/');
+      setTimeout(() => {
+        navigate('/');
+      }, 100);
     }
   };
 

@@ -37,7 +37,11 @@ export const createVideo = createAsyncThunk('videos/createVideo', async (videoDa
 // Update an existing video
 export const updateVideo = createAsyncThunk('videos/updateVideo', async ({ videoId, ...videoData }, { rejectWithValue }) => {
   try {
-    const response = await axios.put(`${API_URL}/videos/${videoId}`, videoData);
+    const token = localStorage.getItem('token');
+    const response = await axios.put(`${API_URL}/videos/${videoId}`, videoData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    // console.log(response);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || 'Failed to update video');
@@ -47,7 +51,10 @@ export const updateVideo = createAsyncThunk('videos/updateVideo', async ({ video
 // Delete a video
 export const deleteVideo = createAsyncThunk('videos/deleteVideo', async (videoId, { rejectWithValue }) => {
   try {
-    await axios.delete(`${API_URL}/videos/${videoId}`);
+    const token = localStorage.getItem('token');
+    await axios.delete(`${API_URL}/videos/${videoId}`,{
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return videoId; // Return videoId to remove from state
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || 'Failed to delete video');
@@ -148,38 +155,38 @@ const videoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    .addCase(updateVideo.pending, (state) => {
-      state.status = 'loading';
-      state.error = null;
-    })
-    .addCase(updateVideo.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      const updatedVideo = action.payload;
-      state.videos = state.videos.map((video) =>
-        video.videoId === updatedVideo.videoId ? updatedVideo : video
-      );
-      state.filteredVideos = state.filteredVideos.map((video) =>
-        video.videoId === updatedVideo.videoId ? updatedVideo : video
-      );
-    })
-    .addCase(updateVideo.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.payload;
-    })
-    .addCase(deleteVideo.pending, (state) => {
-      state.status = 'loading';
-      state.error = null;
-    })
-    .addCase(deleteVideo.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      const videoId = action.payload;
-      state.videos = state.videos.filter((video) => video.videoId !== videoId);
-      state.filteredVideos = state.filteredVideos.filter((video) => video.videoId !== videoId);
-    })
-    .addCase(deleteVideo.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.payload;
-    })
+      .addCase(updateVideo.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updateVideo.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const updatedVideo = action.payload;
+        state.videos = state.videos.map((video) =>
+          video.videoId === updatedVideo.videoId ? updatedVideo : video
+        );
+        state.filteredVideos = state.filteredVideos.map((video) =>
+          video.videoId === updatedVideo.videoId ? updatedVideo : video
+        );
+      })
+      .addCase(updateVideo.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+      .addCase(deleteVideo.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(deleteVideo.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const videoId = action.payload;
+        state.videos = state.videos.filter((video) => video.videoId !== videoId);
+        state.filteredVideos = state.filteredVideos.filter((video) => video.videoId !== videoId);
+      })
+      .addCase(deleteVideo.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
       .addCase(fetchVideos.pending, (state) => {
         state.status = 'loading';
       })

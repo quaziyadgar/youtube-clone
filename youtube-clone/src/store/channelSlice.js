@@ -6,9 +6,9 @@ const API_URL = 'https://youtube-clone-server-sage.vercel.app/api';
 // Fetch all channels (or user-specific channels)
 export const fetchChannels = createAsyncThunk(
   'channels',
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const token = getState().auth.user?.token;
+      const token = localStorage.getItem('token');
       console.log(token);
       const response = await axios.get(`${API_URL}/channels`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -53,8 +53,9 @@ const channelSlice = createSlice({
         state.status = 'loading';
       })
       .addCase(fetchChannels.fulfilled, (state, action) => {
+        // console.log('channels', action.payload);
         state.status = 'succeeded';
-        state.channels.push(action.payload);
+        state.channels = action.payload;
       })
       .addCase(fetchChannels.rejected, (state, action) => {
         state.status = 'failed';

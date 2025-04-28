@@ -32,7 +32,7 @@ export const Header = (props) => {
                     className="p-2 px-4 rounded-full w-48 border-1 border-gray-400 lg:w-150 focus:outline-none focus:ring-1 focus:ring-blue-700 cursor-pointer text-white"
                     onChange={(e) => dispatch(setFilter(e.target.value))}
                 />
-                <FontAwesomeIcon icon="fa-solid fa-magnifying-glass" />
+                {/* <FontAwesomeIcon icon="fa-solid fa-magnifying-glass" /> */}
             </div>
             <div className="flex items-center gap-4">
                 {isAuthenticated ? (
