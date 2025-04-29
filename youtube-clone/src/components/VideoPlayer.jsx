@@ -72,20 +72,21 @@ const VideoPlayer = ({ video, status }) => {
           ></iframe>
         </div>
         <h2 className="text-xl font-semibold mt-4 text-white">{video.title || 'Untitled'}</h2>
-        <div className="flex justify-between items-center mt-2">
-          <div className="flex px-2">
-          <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-black text-sm">
-                      {video.uploader?.[0]?.toUpperCase()}
+        <div className="flex flex-wrap justify-between items-center mt-2">
+          <div className="flex px-2 order-1">
+            <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-black text-sm">
+              {video.uploader?.[0]?.toUpperCase()}
+            </div>
+            <div className="pl-4 text-white flex flex-wrap w-60 overflow-ellipsis">
+              {video.uploader}<br />{video.channelId}
+            </div>
+            <button className="flex bg-white ml-4 rounded-2xl py-2 px-4 h-min border border-white-50 hover:bg-black
+           hover:text-white hover:scale-105 cursor-pointer "
+              onClick={() => setSubscribe(pre => !pre)}>
+              {subscribe ? "🔔Subscribed" : "Subscribe"}
+            </button>
           </div>
-          <div className="pl-4 text-white flex flex-wrap w-max overflow-hidden">
-            {video.uploader}<br />{video.channelId}
-          </div>
-          <button className="flex bg-white ml-4 rounded-2xl py-2 px-4 h-min border border-white-50 hover:bg-black hover:text-white hover:scale-105 cursor-pointer"
-          onClick={()=> setSubscribe(pre=> !pre)}>
-            {subscribe?"🔔Subscribed":"Subscribe"}
-          </button>
-          </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 order-2 mt-2">
             <button
               onClick={handleLike}
               className="flex items-center gap-1 text-sm text-gray-300 hover:text-white"
@@ -107,7 +108,7 @@ const VideoPlayer = ({ video, status }) => {
           </div>
         </div>
         <div className="mt-4 border-t border-gray-700 pt-4">
-        <p className="text-sm text-gray-400">{video.views || 0} views • {new Date(video.uploadDate).toLocaleDateString()}</p>
+          <p className="text-sm text-gray-400">{video.views || 0} views • {new Date(video.uploadDate).toLocaleDateString()}</p>
           <p className="text-sm text-gray-300">{video.description || 'No description'}</p>
           <p className="text-sm text-gray-400 mt-2">Channel: {video.uploader}</p>
         </div>

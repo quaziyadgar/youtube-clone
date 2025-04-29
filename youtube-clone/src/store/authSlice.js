@@ -8,6 +8,7 @@ export const signup = createAsyncThunk('auth/signup', async ({ username, email, 
       email,
       password,
     });
+    localStorage.setItem('loginId', response.data.user.id);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data.error);
@@ -20,7 +21,7 @@ export const login = createAsyncThunk('auth/login', async ({ email, password }, 
       email,
       password,
     });
-    console.log(response.data);
+    localStorage.setItem('loginId', response.data.user.id);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data.error);
@@ -62,7 +63,6 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.isAuthenticated = true;
         localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('loginId', action.payload.user.id);
       })
       .addCase(signup.rejected, (state, action) => {
         state.status = 'failed';
@@ -73,14 +73,13 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
-        // console.log(action)
+        console.log(action);
         state.id = action.payload.user?.id;
         state.status = 'succeeded';
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
         localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('loginId', action.payload.user.id);
       })
       .addCase(login.rejected, (state, action) => {
         state.status = 'failed';

@@ -15,10 +15,10 @@ export const Sidebar = (props) => {
     }
     return (
         isSidebarOpen && <aside
-            className="fixed top-16 left-0 w-64 p-4 border-r border-gray-700 h-[calc(100vh-4rem)] overflow-y-auto hidden md:block">
+            className="fixed top-16 left-0 w-64 p-4 border-r border-gray-700 h-[calc(100vh-4rem)] overflow-y-auto md:block">
             <ul className="space-y-2">
                 {contents.map((content, index) => (
-                    <li key={index} className="p-2 rounded text-white hover:bg-gray-200 hover:text-black">
+                    <li key={index} className="p-2 rounded text-white hover:bg-gray-200 hover:text-black sm:p-1">
                         <Link to={Object.values(content)[0]} onClick={() => setIsSidebarOpen(false)}>
                             {toTitleCase(Object.keys(content)[0])}
                         </Link>
