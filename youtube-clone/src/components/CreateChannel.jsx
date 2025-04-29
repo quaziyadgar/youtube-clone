@@ -28,7 +28,7 @@ const CreateChannel = () => {
     try {
       await dispatch(createChannel({ name: channelName })).unwrap();
       setChannelName('');
-      navigate('/'); // Redirect to homepage or channel page
+      navigate('/channel'); // Redirect to homepage or channel page
     } catch (err) {
       setFormError(err || 'Failed to create channel');
     }

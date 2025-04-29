@@ -8,26 +8,26 @@ const VideoCard = lazy(() => import('../components/VideoCard'));
 const HomePage = (props) => {
   const dispatch = useDispatch();
   const { status, filteredVideos } = useSelector((state) => state.videos);
-  const {isSidebarOpen, setIsSidebarOpen} = props;
+  const { isSidebarOpen, setIsSidebarOpen } = props;
 
   useEffect(() => {
-    if (status === 'idle') {
+    if (status === 'idle')
       dispatch(fetchVideos());
-    }
+    console.log(status, filteredVideos);
   }, [status, dispatch]);
 
-  // const filteredVideos = useMemo(() => {
-  //   if (!filter) return videos;
-  //   return videos.filter((video) =>
-  //     video.title.toLowerCase().includes(filter.toLowerCase()) ||
-  //     video.description.toLowerCase().includes(filter.toLowerCase())
-  //   );
-  // }, [videos, filter]);
+  useEffect(() => {
+    if (filteredVideos == [] && status === 'succeeded')
+      dispatch(fetchVideos);
+  }, [])
+
+  if (status === 'failed')
+    return <>Server issue...</>
 
   return (
     <div className={`${isSidebarOpen && 'ml-64'} min-h-screen`}>
       <div className="flex">
-      <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+        <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
         <main className="flex-1 p-4">
           <div className="flex gap-2 mb-4 overflow-x-auto">
             {['All', 'Songs', 'Tech', 'Gaming'].map((category) => (

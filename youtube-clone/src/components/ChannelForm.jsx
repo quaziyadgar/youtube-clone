@@ -22,10 +22,10 @@ const ChannelForm = () => {
         .unwrap()
         .then(() => {
           setName('');
-          navigate('/'); // Redirect to home or channel page
+          navigate('/channel'); // Redirect to home or channel page
         })
-        .catch(() => {
-          // Error handled by Redux state
+        .catch((err) => {
+          console.log({err})
         });
     }
   };

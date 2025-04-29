@@ -9,6 +9,8 @@ const VideoPlayer = ({ video, status }) => {
   const [commentText, setCommentText] = useState('');
   const [editCommentId, setEditCommentId] = useState(null);
   const [editCommentText, setEditCommentText] = useState('');
+  const [display, setDisplay] = useState('');
+  const [subscribe, setSubscribe] = useState(false);
 
   if (!video) return <div className="text-white">Loading video...</div>;
   if (!video.videoUrl) return <div className="text-white">Error: Video URL not found</div>;
@@ -71,7 +73,18 @@ const VideoPlayer = ({ video, status }) => {
         </div>
         <h2 className="text-xl font-semibold mt-4 text-white">{video.title || 'Untitled'}</h2>
         <div className="flex justify-between items-center mt-2">
-          <p className="text-sm text-gray-400">{video.views || 0} views • {new Date(video.uploadDate).toLocaleDateString()}</p>
+          <div className="flex px-2">
+          <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-black text-sm">
+                      {video.uploader?.[0]?.toUpperCase()}
+          </div>
+          <div className="pl-4 text-white flex flex-wrap w-max overflow-hidden">
+            {video.uploader}<br />{video.channelId}
+          </div>
+          <button className="flex bg-white ml-4 rounded-2xl py-2 px-4 h-min border border-white-50 hover:bg-black hover:text-white hover:scale-105 cursor-pointer"
+          onClick={()=> setSubscribe(pre=> !pre)}>
+            {subscribe?"🔔Subscribed":"Subscribe"}
+          </button>
+          </div>
           <div className="flex gap-2">
             <button
               onClick={handleLike}
@@ -94,6 +107,7 @@ const VideoPlayer = ({ video, status }) => {
           </div>
         </div>
         <div className="mt-4 border-t border-gray-700 pt-4">
+        <p className="text-sm text-gray-400">{video.views || 0} views • {new Date(video.uploadDate).toLocaleDateString()}</p>
           <p className="text-sm text-gray-300">{video.description || 'No description'}</p>
           <p className="text-sm text-gray-400 mt-2">Channel: {video.uploader}</p>
         </div>
@@ -122,10 +136,10 @@ const VideoPlayer = ({ video, status }) => {
                 video.comments.map((comment) => (
                   <div key={comment.commentId} className="flex gap-3">
                     <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-black text-sm">
-                      {comment?.userId}
+                      {comment?.userId?.[0]?.toUpperCase()}
                     </div>
                     <div className="flex-1">
-                      {editCommentId == comment.commentId ? (
+                      {editCommentId === comment.commentId ? (
                         <form onSubmit={handleEditSubmit} className="mb-2">
                           <textarea
                             value={editCommentText}
@@ -150,26 +164,31 @@ const VideoPlayer = ({ video, status }) => {
                           </div>
                         </form>
                       ) : (
-                        <>
+                        <div className='relative'>
                           <p className="text-sm text-white">{comment.userId} • {new Date(comment.timestamp).toLocaleDateString()}</p>
                           <p className="text-sm text-white">{comment.text}</p>
-                          {user && localStorage.getItem(loginId) == comment.userId && (
-                            <div className="flex gap-2 mt-1">
-                              <button
-                                onClick={() => handleEditComment(comment)}
-                                className="text-xs text-white hover:text-blue-300"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => handleDeleteComment(comment.commentId)}
-                                className="text-xs text-red-400 hover:text-red-300"
-                              >
-                                Delete
-                              </button>
-                            </div>
+                          {user && localStorage.getItem('loginId') == comment.userId && (
+                            <>
+                              <button className='text-white font-bold absolute top-0 right-1 cursor-pointer w-5'
+                                onClick={() => setDisplay(comment.commentId)}
+                              >⁝</button>
+                              {display === comment.commentId && <div className={`flex w-14 h-14 p-1 pl-2 align-middle flex-wrap rounded absolute top-1 right-4 bg-gray-800 border-2`}>
+                                <button
+                                  onClick={() => handleEditComment(comment)}
+                                  className="text-xs text-white hover:text-blue-300 cursor-pointer"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteComment(comment.commentId)}
+                                  className="text-xs text-red-400 hover:text-red-300 cursor-pointer"
+                                >
+                                  Delete
+                                </button>
+                              </div>}
+                            </>
                           )}
-                        </>
+                        </div>
                       )}
                     </div>
                   </div>

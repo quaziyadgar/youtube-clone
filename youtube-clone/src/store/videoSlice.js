@@ -237,9 +237,9 @@ const videoSlice = createSlice({
         const video = state.videos.find(v => v.videoId === action.meta.arg.videoId);
         const filteredVideo = state.filteredVideos.find(v => v.videoId === action.meta.arg.videoId);
         const currentVideo = state.currentVideo?.videoId === action.meta.arg.videoId ? state.currentVideo : null;
-        if (video) video.comments.push(action.payload);
-        if (filteredVideo) filteredVideo.comments.push(action.payload);
-        if (currentVideo) currentVideo.comments.push(action.payload);
+        if (video) video.comments.push(action.payload.comment);
+        if (filteredVideo) filteredVideo.comments.push(action.payload.comment);
+        if (currentVideo) currentVideo.comments.push(action.payload.comment);
       })
       .addCase(addComment.pending, (state) => {
         state.status = 'loading';
