@@ -144,7 +144,8 @@ const videoSlice = createSlice({
     currentVideo: null,
     status: 'idle',
     error: null,
-    channelNames: {}
+    channelNames: {},
+    commentStatus: 'idle',
   },
   reducers: {
     setFilter: (state, action) => {
@@ -233,7 +234,7 @@ const videoSlice = createSlice({
         if (currentVideo) currentVideo.dislikes = action.payload.dislikes;
       })
       .addCase(addComment.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.commentStatus = 'succeeded';
         const video = state.videos.find(v => v.videoId === action.meta.arg.videoId);
         const filteredVideo = state.filteredVideos.find(v => v.videoId === action.meta.arg.videoId);
         const currentVideo = state.currentVideo?.videoId === action.meta.arg.videoId ? state.currentVideo : null;
@@ -242,10 +243,10 @@ const videoSlice = createSlice({
         if (currentVideo) currentVideo.comments.push(action.payload.comment);
       })
       .addCase(addComment.pending, (state) => {
-        state.status = 'loading';
+        state.commentStatus = 'loading';
       })
       .addCase(editComment.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.commentStatus = "succeeded";
         const video = state.videos.find(v => v.videoId === action.meta.arg.videoId);
         const filteredVideo = state.filteredVideos.find(v => v.videoId === action.meta.arg.videoId);
         const currentVideo = state.currentVideo?.videoId === action.meta.arg.videoId ? state.currentVideo : null;
@@ -272,10 +273,10 @@ const videoSlice = createSlice({
         }
       })
       .addCase(editComment.pending, (state) => {
-        state.status = 'loading';
+        state.commentStatus = 'loading';
       })
       .addCase(deleteComment.fulfilled, (state, action) => {
-        state.status = "succeeded"
+        state.commentStatus = "succeeded"
         const video = state.videos.find(v => v.videoId === action.payload.videoId);
         const filteredVideo = state.filteredVideos.find(v => v.videoId === action.payload.videoId);
         const currentVideo = state.currentVideo?.videoId === action.payload.videoId ? state.currentVideo : null;
@@ -290,7 +291,7 @@ const videoSlice = createSlice({
         }
       })
       .addCase(deleteComment.pending, (state) => {
-        state.status = 'loading';
+        state.commentStatus = 'loading';
       });
   },
 });

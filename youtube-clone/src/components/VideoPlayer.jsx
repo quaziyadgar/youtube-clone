@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { likeVideo, dislikeVideo, addComment, editComment, deleteComment } from '../store/videoSlice';
 
-const VideoPlayer = ({ video, status }) => {
+const VideoPlayer = ({ video, status, commentStatus }) => {
   const dispatch = useDispatch();
-  const { id: loginId, user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   // const channelName = useSelector((state) => state.videos.channelNames[video?.channelId])
   const [commentText, setCommentText] = useState('');
   const [editCommentId, setEditCommentId] = useState(null);
@@ -57,10 +57,11 @@ const VideoPlayer = ({ video, status }) => {
     }
   };
 
-  console.log(loginId, user, video);
+  // console.log(loginId, user, video);
 
   return (
     <div className="bg-black py-10">
+      {(status === "loading") ? <div>loading...</div> : 
       <div className="max-w-5xl mx-auto bg-black">
         <div className="relative" style={{ aspectRatio: '16/9' }}>
           <iframe
@@ -112,7 +113,7 @@ const VideoPlayer = ({ video, status }) => {
           <p className="text-sm text-gray-300">{video.description || 'No description'}</p>
           <p className="text-sm text-gray-400 mt-2">Channel: {video.uploader}</p>
         </div>
-        {(status === "loading") ? <div>loading...</div> :
+        {(commentStatus === "loading") ? <div>loading...</div> :
           <div className="mt-6">
             <h3 className="text-lg font-semibold text-black mb-4">Comments</h3>
             {user && (
@@ -199,7 +200,7 @@ const VideoPlayer = ({ video, status }) => {
               )}
             </div>
           </div>}
-      </div>
+      </div>}
     </div>
   );
 };

@@ -54,7 +54,7 @@ const ChannelForm = () => {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm text-white disabled:opacity-50"
+          className="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm text-white disabled:opacity-50 cursor-pointer"
         >
           {status === 'loading' ? 'Creating...' : 'Create Channel'}
         </button>

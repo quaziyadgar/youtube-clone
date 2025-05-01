@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 const VideoPage = () => {
   const { videoId } = useParams();
   const dispatch = useDispatch();
-  const { currentVideo, status } = useSelector((state) => state.videos);
+  const { currentVideo, status, commentStatus } = useSelector((state) => state.videos);
 
   useEffect(() => {
     dispatch(fetchVideo(videoId));
@@ -16,7 +16,7 @@ const VideoPage = () => {
   if (status === 'loading') return <div className='text-white'>Loading...</div>;
   if (status === 'failed' || !currentVideo) return <div className='text-white'>Video not found</div>;
 
-  return <VideoPlayer video={currentVideo} status={status} />;
+  return <VideoPlayer video={currentVideo} status={status} commentStatus={commentStatus} />;
 };
 
 export default VideoPage;
