@@ -13,7 +13,7 @@ const HomePage = (props) => {
   useEffect(() => {
     if (status === 'idle')
       dispatch(fetchVideos());
-    console.log(status, filteredVideos);
+    // console.log(status, filteredVideos);
   }, [status, dispatch]);
 
   useEffect(() => {

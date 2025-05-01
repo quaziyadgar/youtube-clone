@@ -9,7 +9,7 @@ export const fetchChannels = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      console.log(token);
+      // console.log(token);
       const response = await axios.get(`${API_URL}/channels`, {
         headers: { Authorization: `Bearer ${token}` },
       });

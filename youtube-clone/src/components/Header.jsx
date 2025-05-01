@@ -40,7 +40,7 @@ export const Header = (props) => {
                         <button className="h-10 w-10 rounded-full justify-center align-middle bg-blue-500 text-lg font-medium text-white cursor-pointer"
                             onClick={() => setContentWrapped(prev => !prev)}
                         >
-                            {user.username[0].toUpperCase()}
+                            {user?.username?.[0]?.toUpperCase()}
                         </button>
                         {(contentWrapped && <div className={`flex flex-wrap absolute w-20 rounded-lg right-4 top-16 bg-white justify-center`}>
                             <Link to="/channel" className="text-red-700 cursor-pointer hover:underline mt-2"

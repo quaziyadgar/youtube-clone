@@ -34,7 +34,7 @@ const Channel = () => {
     }
     try {
       if (editMode) {
-        console.log(editMode);
+        // console.log(editMode);
         await dispatch(updateVideo({ videoId: editVideoId, ...formData })).unwrap();
         alert('Video updated successfully');
       } else {
@@ -54,10 +54,10 @@ const Channel = () => {
     setEditMode(true);
     setEditVideoId(video.videoId);
     setFormData({
-      title: video.title,
-      description: video.description,
-      videoUrl: video.videoUrl,
-      channelId: video.channelId,
+      title: video?.title,
+      description: video?.description,
+      videoUrl: video?.videoUrl,
+      channelId: video?.channelId,
     });
   };
 
@@ -72,11 +72,18 @@ const Channel = () => {
   };
   
   useEffect(() => {
-    dispatch(fetchChannels());
-    dispatch(fetchVideos());
-    const userChannelsData = channels.filter((channel) => channel.userId === user?.userId);
-    setUserChannels(userChannelsData);
+      dispatch(fetchChannels());
+      dispatch(fetchVideos());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (localStorage.getItem('loginId') && channels.length > 0) {
+      const userChannelsData = channels.filter((channel) => channel.userId === user._id);
+      setUserChannels(userChannelsData);
+    } else {
+      setUserChannels([]);
+    }
+  }, [channels, user]);
 
   // const channelVideos = filteredVideos.filter((video) => video.channelId === channelId);
 
