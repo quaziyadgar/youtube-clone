@@ -1,17 +1,3 @@
-
- 
-### README for Frontend
-
-Below is a professional README for your frontend, written in Markdown and designed for `client/README.md`. It includes:
-- Project overview.
-- Features (e.g., video browsing, liking/disliking).
-- Prerequisites and setup instructions.
-- Running locally and deploying to Vercel.
-- Environment variables and backend integration.
-- Troubleshooting (e.g., `userId` undefined, video API issues).
-- Folder structure and contribution guidelines.
-
-
 # YouTube Clone Frontend
 
 This is the frontend for a YouTube clone application, built with **React**, **Vite**, **Tailwind CSS**, and **Redux Toolkit**. It provides a user interface for browsing videos, liking/disliking videos, commenting, and managing user authentication. The frontend integrates with a Node.js/Express/MongoDB backend deployed at `https://youtube-clone-server-sage.vercel.app`.
